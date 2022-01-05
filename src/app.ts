@@ -2,6 +2,7 @@ import express from "express";
 import bearerToken from "express-bearer-token";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import helmet from "helmet";
 
 import config from "./config";
 import { httpLogStream, logger } from "./resources/logger";
@@ -22,23 +23,20 @@ class App {
     this.app.use("/docs", serviceDocsRouter);
   }
   private initializeMiddlewares() {
+    this.app.use(helmet());
     this.app.use(express.json()); // for parsing application/json
-    this.app.use(attachIdentity);
     this.app.use(
       bearerToken({
         headerKey: "Bearer",
         reqKey: "token",
       })
     );
+    this.app.use(attachIdentity);
   }
   private connectMongoDB() {
     const { mongoURI } = config;
-    const mongooseOption = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    };
-    mongoose.connect(mongoURI, mongooseOption).then(() => {
+    const mongooseOptions: mongoose.ConnectOptions = {};
+    mongoose.connect(mongoURI, mongooseOptions).then(() => {
       logger.info(`MongoDB connected`);
     });
   }
