@@ -1,3 +1,6 @@
 export interface User {
-  userType: any;
+  idx: number;
+  username: string;
+  password: string;
+  email: string;
 }
